@@ -2,9 +2,23 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Pagination from '../components/Pagination';
 import { ThemeProvider } from 'styled-components';
 import { Repository, ApiResponse } from '../interfaces';
-import { PAGE_SIZE } from '../utilities/constants';
+import {
+  API_EXT_PAGE_NUMBER,
+  API_EXT_PER_PAGE,
+  APP_TITLE,
+  BASE_API,
+  COMMON_TEXTS,
+  DEFAULT_TOTAL_PAGE,
+  PAGE_SIZE,
+} from '../utilities/constants';
 import theme from '../styles/theme';
-import { PageContainer, PageTitle, SearchButton, SearchContainer, SearchInput } from '../styles/globalStyledComponents';
+import {
+  PageContainer,
+  PageTitle,
+  SearchButton,
+  SearchContainer,
+  SearchInput,
+} from '../styles/globalStyledComponents';
 import LoadingComponent from '../components/LoadingComponent';
 import { ListComponent } from '../components/ListComponent';
 
@@ -28,7 +42,7 @@ const SearchRepositories = () => {
       setLoading(true);
       const encodedSearchTerm = encodeURIComponent(searchTerm);
 
-      fetch(`https://api.github.com/search/repositories?q=${encodedSearchTerm}&per_page=${pageSize}&page=${page}`)
+      fetch(`${BASE_API}${encodedSearchTerm}${API_EXT_PER_PAGE}${pageSize}${API_EXT_PAGE_NUMBER}${page}`)
         .then((response) => response.json())
         .then((data: ApiResponse) => {
           if (data?.errors) {
@@ -79,7 +93,7 @@ const SearchRepositories = () => {
     <ThemeProvider theme={theme}>
       <PageContainer>
         <PageTitle>
-          Search Github Repositories
+          { APP_TITLE }
         </PageTitle>
         <SearchContainer>
           <SearchInput
@@ -87,13 +101,13 @@ const SearchRepositories = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search for a repository..."
+            placeholder={COMMON_TEXTS.SEARCH_PLACEHOLDER}
           />
           <SearchButton
             disabled={searchTerm?.length < 1}
             onClick={() => handleSearch(1)}
           >
-            Search
+            { COMMON_TEXTS.SEARCH }
           </SearchButton>
         </SearchContainer>
         <LoadingComponent isLoading={loading} />
@@ -104,7 +118,11 @@ const SearchRepositories = () => {
           cleanSearch={cleanSearch.current}
         />
         { repositories?.length > 0 && totalCount > PAGE_SIZE && (
-          <Pagination currentPage={currentPage} totalPages={totalCount/PAGE_SIZE || 1} onPageChange={setCurrentPage}/>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalCount/PAGE_SIZE || DEFAULT_TOTAL_PAGE}
+            onPageChange={setCurrentPage}
+          />
         )}
       </PageContainer>
     </ThemeProvider>

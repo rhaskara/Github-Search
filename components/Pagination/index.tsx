@@ -1,5 +1,6 @@
 import React from "react";
 import { PaginationProps } from '../../interfaces';
+import { COMMON_TEXTS } from "../../utilities/constants";
 import {
   PaginationContainer,
   DirectionalButtons,
@@ -24,7 +25,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
         <DirectionalButtons
           onClick={() => onPageChange(currentPage - 1)}
         >
-          Prev
+          { COMMON_TEXTS.PREVIOUS }
         </DirectionalButtons>
       )}
       {pageNumbers.map((page) => (
@@ -41,7 +42,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
         <DirectionalButtons
           onClick={() => onPageChange(currentPage + 1)}
         >
-          Next
+          { COMMON_TEXTS.NEXT }
         </DirectionalButtons>
       )}
     </PaginationContainer>
