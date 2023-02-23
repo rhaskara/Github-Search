@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Pagination from '../components/Pagination';
 import { ThemeProvider } from 'styled-components';
 import { Repository, ApiResponse } from '../interfaces';
 import { PAGE_SIZE } from '../utilities/constants';
 import theme from '../styles/theme';
-import ErrorComponent from '../components/ErrorComponent';
-import { PageContainer, PageTitle } from '../styles/globalStyledComponents';
+import { PageContainer, PageTitle, SearchButton, SearchContainer, SearchInput } from '../styles/globalStyledComponents';
 import LoadingComponent from '../components/LoadingComponent';
+import { ListComponent } from '../components/ListComponent';
 
 const SearchRepositories = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -18,9 +18,13 @@ const SearchRepositories = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [errorEvent, setError] = useState<string|undefined>(undefined);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const cleanSearch = useRef<Boolean>(true);
 
   const searchForRepositories = useCallback((page: number, pageSize: number) => {
-    if (searchTerm) {
+    if (searchTerm && searchTerm?.length > 0) {
+      if (cleanSearch.current) {
+        cleanSearch.current = false;
+      }
       setLoading(true);
       const encodedSearchTerm = encodeURIComponent(searchTerm);
 
@@ -41,12 +45,13 @@ const SearchRepositories = () => {
         })
         .finally(() => setLoading(false));
     } else {
-      setRepositories([]);
+      return;
     }
   }, [searchTerm]);
 
   const handleSearch = useCallback((page: number) => {
     if (!searchThrottleTimeout) {
+      setError(undefined);
       searchForRepositories(page, PAGE_SIZE);
       const timeoutId = window.setTimeout(() => {
         setSearchThrottleTimeout(null);
@@ -73,39 +78,34 @@ const SearchRepositories = () => {
   return (
     <ThemeProvider theme={theme}>
       <PageContainer>
-        { errorEvent
-            ? <ErrorComponent message={errorEvent} />
-            : <div>
-                <PageTitle>
-                  Search Github Repositories
-                </PageTitle>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Search for a repository..."
-                />
-                <button onClick={() => handleSearch(1)}>Search</button>
-                <LoadingComponent isLoading={loading} />
-                { repositories?.length === 0 && !loading && !errorEvent && (
-                  <div>No repositories found.</div>
-                )}
-                { repositories?.length > 0 && (
-                  <ul>
-                    {repositories?.map((repository) => (
-                      <li key={repository.html_url}>
-                        <a href={repository.html_url}>{repository.name}</a>
-                        <p>{repository.description}</p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                { repositories?.length > 0 && (
-                  <Pagination currentPage={currentPage} totalPages={totalCount/PAGE_SIZE || 1} onPageChange={setCurrentPage}/>
-                )}
-              </div>
-        }
+        <PageTitle>
+          Search Github Repositories
+        </PageTitle>
+        <SearchContainer>
+          <SearchInput
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Search for a repository..."
+          />
+          <SearchButton
+            disabled={searchTerm?.length < 1}
+            onClick={() => handleSearch(1)}
+          >
+            Search
+          </SearchButton>
+        </SearchContainer>
+        <LoadingComponent isLoading={loading} />
+        <ListComponent
+          repositories={repositories}
+          loading={loading}
+          errorEvent={errorEvent}
+          cleanSearch={cleanSearch.current}
+        />
+        { repositories?.length > 0 && totalCount > PAGE_SIZE && (
+          <Pagination currentPage={currentPage} totalPages={totalCount/PAGE_SIZE || 1} onPageChange={setCurrentPage}/>
+        )}
       </PageContainer>
     </ThemeProvider>
   );

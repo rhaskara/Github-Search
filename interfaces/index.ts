@@ -28,3 +28,17 @@ export interface ErrorComponentProps {
 export interface LoadingComponentProps {
   isLoading: boolean;
 };
+
+export interface SearchComponentProps {
+  setSearchTerm: () => void;
+  onKeyDown: () => void;
+  handleSearch: (page: number) => void;
+  searchPlaceholder: string;
+};
+
+export interface ListComponentProps {
+  repositories: Repository[];
+  loading: boolean;
+  errorEvent: string;
+  cleanSearch: Boolean;
+};

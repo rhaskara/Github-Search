@@ -1,16 +1,11 @@
 import React from 'react';
 import { ErrorComponentProps } from '../../interfaces';
-import { ErrorContainer, ErrorText, ReloadButton } from './styles';
+import { ErrorContainer, ErrorText } from './styles';
 
-const ErrorComponent = ({ message = 'Error: Something Went Wrong' }: ErrorComponentProps) => {
-  const handleReload = () => {
-    window.location.reload();
-  }
-
-  return (<ErrorContainer>
+const ErrorComponent = ({ message = 'Error: Something Went Wrong' }: ErrorComponentProps) => (
+  <ErrorContainer>
     <ErrorText>{message}</ErrorText>
-    <ReloadButton onClick={handleReload}>Reload</ReloadButton>
-  </ErrorContainer>)
-};
+  </ErrorContainer>
+);
 
 export default ErrorComponent;
