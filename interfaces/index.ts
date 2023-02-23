@@ -24,3 +24,7 @@ export interface PaginationProps {
 export interface ErrorComponentProps {
   message: string;
 };
+
+export interface LoadingComponentProps {
+  isLoading: boolean;
+};

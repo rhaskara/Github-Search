@@ -6,6 +6,7 @@ import { PAGE_SIZE } from '../utilities/constants';
 import theme from '../styles/theme';
 import ErrorComponent from '../components/ErrorComponent';
 import { PageContainer, PageTitle } from '../styles/globalStyledComponents';
+import LoadingComponent from '../components/LoadingComponent';
 
 const SearchRepositories = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -86,14 +87,7 @@ const SearchRepositories = () => {
                   placeholder="Search for a repository..."
                 />
                 <button onClick={() => handleSearch(1)}>Search</button>
-                {loading && <div style={{
-                  position: 'fixed',
-                  display: 'block',
-                  zIndex: 9999,
-                  width: '100vw',
-                  height: '100vh',
-                  backgroundColor: 'white',
-                }}>Loading...</div>}
+                <LoadingComponent isLoading={loading} />
                 { repositories?.length === 0 && !loading && !errorEvent && (
                   <div>No repositories found.</div>
                 )}
